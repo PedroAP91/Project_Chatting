@@ -38,14 +38,18 @@ public class UserService {
     public String loginUser(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Contraseña incorrecta");
+        // Comparar contraseña usando BCrypt
+        if (passwordEncoder.matches(password, user.getPassword())) {
+            // Generar el token con jwtUtils
+            String token = jwtUtils.generateToken(email);
+            // Puedes agregar un log para confirmar
+            System.out.println("Token generado: " + token);
+            return token;
+        } else {
+            // Si la contraseña no coincide, lanza una excepción o maneja el error
+            throw new RuntimeException("Credenciales inválidas");
         }
-
-        return jwtUtils.generateToken(user.getEmail());
     }
-
     public UserDTO getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));

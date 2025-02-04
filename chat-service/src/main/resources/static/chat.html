@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Cliente de Chat</title>
+    <!-- Incluye SockJS y STOMP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+<h2>Cliente de Chat</h2>
+<div id="status">Desconectado</div>
+<div id="messages" style="border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll;">
+    <!-- Aquí se mostrarán los mensajes -->
+</div>
+<div style="margin-top: 10px;">
+    <input type="text" id="messageInput" placeholder="Escribe tu mensaje aquí" style="width: 70%;">
+    <button onclick="sendMessage()">Enviar</button>
+</div>
+
+<script>
+    // Conecta al endpoint de WebSocket del chat-service en el puerto 8081
+    var socket = new SockJS('http://localhost:8081/chat');
+    var stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function(frame) {
+        document.getElementById('status').innerHTML = 'Conectado: ' + frame;
+
+        // Suscribirse al tópico para recibir mensajes
+        stompClient.subscribe('/topic/messages', function(message) {
+            var msg = JSON.parse(message.body);
+            var messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML += '<p><strong>' + msg.from + ':</strong> ' + msg.text + '</p>';
+            // Opcional: Desplazar hacia abajo automáticamente
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        });
+    }, function(error) {
+        document.getElementById('status').innerHTML = 'Error al conectar: ' + error;
+        console.error('Error de conexión:', error);
+    });
+
+    // Función para enviar mensajes
+    function sendMessage() {
+        var messageInput = document.getElementById('messageInput');
+        var text = messageInput.value;
+        if (text.trim() !== '') {
+            // Envía el mensaje al endpoint "/app/message"
+            stompClient.send("/app/message", {}, JSON.stringify({
+                from: "Usuario", // Puedes cambiar este valor o hacer que el usuario lo ingrese
+                text: text
+            }));
+            messageInput.value = ''; // Limpia el campo
+        }
+    }
+</script>
+</body>
+</html>
