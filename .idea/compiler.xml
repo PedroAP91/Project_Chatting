@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="chat-service" />
         <module name="auth-service" />
+        <module name="common-utils" />
       </profile>
     </annotationProcessing>
   </component>

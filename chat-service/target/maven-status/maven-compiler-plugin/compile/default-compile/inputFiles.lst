@@ -1,8 +1,8 @@
 C:\Users\pedri\Desktop\Proyect_Chatting\chat-service\src\main\java\PedroAP\chat_service\ChatServiceApplication.java
 C:\Users\pedri\Desktop\Proyect_Chatting\chat-service\src\main\java\PedroAP\chat_service\config\JwtHandshakeInterceptor.java
 C:\Users\pedri\Desktop\Proyect_Chatting\chat-service\src\main\java\PedroAP\chat_service\config\SecurityConfig.java
+C:\Users\pedri\Desktop\Proyect_Chatting\chat-service\src\main\java\PedroAP\chat_service\config\StompPrincipal.java
 C:\Users\pedri\Desktop\Proyect_Chatting\chat-service\src\main\java\PedroAP\chat_service\config\WebSocketConfig.java
 C:\Users\pedri\Desktop\Proyect_Chatting\chat-service\src\main\java\PedroAP\chat_service\controller\ChatController.java
 C:\Users\pedri\Desktop\Proyect_Chatting\chat-service\src\main\java\PedroAP\chat_service\Listener\WebSocketEventListener.java
 C:\Users\pedri\Desktop\Proyect_Chatting\chat-service\src\main\java\PedroAP\chat_service\model\ChatMessage.java
-C:\Users\pedri\Desktop\Proyect_Chatting\chat-service\src\main\java\PedroAP\chat_service\security\JwtUtils.java

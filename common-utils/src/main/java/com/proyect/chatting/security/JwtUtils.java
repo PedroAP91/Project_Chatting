@@ -1,31 +1,43 @@
-package PedroAP.auth_service.security;
+package com.proyect.chatting.security;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
+
 import java.security.Key;
 import java.util.Date;
 
 @Component
 public class JwtUtils {
 
-    // Declara la clave secreta
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private final long expirationMs = 3600000;  // 1 hora
 
     public String generateToken(String email) {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
+                .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 hora
                 .signWith(key)
                 .compact();
     }
 
-    public String validateToken(String token) {
+    // Método que valida el token y devuelve un boolean
+    public boolean validateToken(String token) {
         try {
-            // Aquí se utiliza la variable key para validar el token
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // Método que extrae el email (subject) del token
+    public String getSubjectFromToken(String token) {
+        try {
             return Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()

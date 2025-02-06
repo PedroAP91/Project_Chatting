@@ -1,19 +1,27 @@
 package PedroAP.chat_service.controller;
 
 import PedroAP.chat_service.model.ChatMessage;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
+import com.proyect.chatting.security.JwtUtils;
+
 import org.springframework.stereotype.Controller;
 
 @Controller
 public class ChatController {
 
-    // Cuando el cliente envíe un mensaje a "/app/message", este método lo procesará
-    @MessageMapping("/message")
-    // Y retransmitirá el mensaje a todos los suscritos al destino "/topic/messages"
-    @SendTo("/topic/messages")
-    public ChatMessage sendMessage(ChatMessage message) throws Exception {
-        // Aquí puedes agregar lógica de procesamiento (por ejemplo, guardar en base de datos o filtrar contenido)
-        return message;
+    private final JwtUtils jwtUtils;
+
+    public ChatController(JwtUtils jwtUtils) {
+        this.jwtUtils = jwtUtils;
+    }
+
+    public ChatMessage sendMessage(ChatMessage message) {
+        // Aquí se invoca el método validateToken de JwtUtils
+        String token = "someToken"; // En un escenario real, extraerías el token de los headers de la solicitud
+        if (jwtUtils.validateToken(token)) {
+            // Si el token es válido, procesamos el mensaje
+            return message;
+        } else {
+            throw new IllegalArgumentException("Token inválido");
+        }
     }
 }

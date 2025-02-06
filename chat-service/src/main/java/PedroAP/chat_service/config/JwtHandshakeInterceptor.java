@@ -1,39 +1,45 @@
 package PedroAP.chat_service.config;
 
-import PedroAP.chat_service.security.JwtUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
+import com.proyect.chatting.security.JwtUtils;
+
 
 import java.util.List;
 import java.util.Map;
 
 public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
+    @Autowired
+    private JwtUtils jwtUtils;
+
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
-                                   WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
-        // Se asume que el token se envía como parámetro de la URL, por ejemplo: /chat?token=xxx
+                                   WebSocketHandler wsHandler, Map<String, Object> attributes) {
+
         List<String> tokenList = request.getHeaders().get("Sec-WebSocket-Protocol");
-        String token = null;
+
         if (tokenList != null && !tokenList.isEmpty()) {
-            // Aquí podrías obtener el token del encabezado o modificar la estrategia para extraerlo
-            token = tokenList.get(0);
+            String token = tokenList.get(0);
+
+            if (jwtUtils.validateToken(token)) {
+                String email = jwtUtils.getSubjectFromToken(token);
+                if (email != null) {
+                    attributes.put("jwt", token);
+                    attributes.put("email", email);  // Añade el email a los atributos si es necesario
+                    return true;
+                }
+            }
         }
 
-        // O también puedes obtenerlo desde la URI, según tu diseño
-        // String token = extractTokenFromUri(request.getURI().toString());
-
-        // Valida el token usando una utilidad (debes implementarla o usar la ya existente en Auth Service)
-        if (token != null && JwtUtils.validateToken(token)) {
-            // Puedes almacenar información en 'attributes' para usarla en el contexto del WebSocket
-            attributes.put("jwt", token);
-            return true;
-        }
-        // Si el token es inválido, se rechaza el handshake
         return false;
     }
+
+
+
 
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response,

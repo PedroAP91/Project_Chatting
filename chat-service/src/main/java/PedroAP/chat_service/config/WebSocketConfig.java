@@ -1,6 +1,5 @@
 package PedroAP.chat_service.config;
 
-import PedroAP.chat_service.security.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
@@ -13,6 +12,7 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import com.proyect.chatting.security.JwtUtils;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -50,9 +50,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                     if (authHeader != null && authHeader.startsWith("Bearer ")) {
                         String token = authHeader.substring(7);
                         // Validamos el token (aquí puedes personalizar la validación)
-                        if (jwtUtils.validateToken(token) != null) {
+                        if (jwtUtils.validateToken(token)){
                             // Si el token es válido, obtenemos el email u otra información del token
-                            String email = jwtUtils.validateToken(token);
+                            String email = jwtUtils.getSubjectFromToken(token);
                             // Puedes establecer un usuario autenticado en el contexto del WebSocket
                             accessor.setUser(new StompPrincipal(email));
                         } else {

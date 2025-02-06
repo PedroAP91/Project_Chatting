@@ -8,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.filter.OncePerRequestFilter;
+import com.proyect.chatting.security.JwtUtils;
 
 import java.io.IOException;
 
@@ -29,14 +30,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
 
-            try {
-                String email = jwtUtils.validateToken(token);
+            // Valida el token
+            if (jwtUtils.validateToken(token)) {
+                // Si es válido, obtenemos el email del token
+                String email = jwtUtils.getSubjectFromToken(token);
+
                 if (email != null) {
                     SecurityContextHolder.getContext().setAuthentication(
                             new UsernamePasswordAuthenticationToken(email, null, null)
                     );
                 }
-            } catch (Exception e) {
+            } else {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token inválido");
                 return;
             }
