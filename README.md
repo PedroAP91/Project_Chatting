@@ -1,5 +1,5 @@
 
-<<<<<<< HEAD
+
 # Proyecto Chatting
 
 Este proyecto es una aplicación de microservicios desarrollada en Java utilizando Spring Boot. Los microservicios incluyen un servicio de autenticación (Auth Service) y un servicio de chat en tiempo real (Chat Service) basado en WebSockets.
