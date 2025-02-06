@@ -1,4 +1,4 @@
-HELP.md
+auth-service/HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+# Ignorar carpetas de compilación y resultados de pruebas
+**/target/
+**/maven-status/
+**/surefire-reports/
