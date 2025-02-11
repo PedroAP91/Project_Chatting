@@ -28,14 +28,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // Prefijo para mensajes dirigidos a métodos en los controladores
         registry.setApplicationDestinationPrefixes("/app");
     }
-
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // Registra el endpoint del WebSocket y usa allowedOriginPatterns para CORS
         registry.addEndpoint("/chat")
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
+
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
@@ -47,25 +46,25 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 // Si es un mensaje de conexión, validamos el token
                 if (StompCommand.CONNECT.equals(accessor.getCommand())) {
                     String authHeader = accessor.getFirstNativeHeader("Authorization");
-                    if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                        String token = authHeader.substring(7);
-                        // Validamos el token (aquí puedes personalizar la validación)
-                        if (jwtUtils.validateToken(token)){
-                            // Si el token es válido, obtenemos el email u otra información del token
-                            String email = jwtUtils.getSubjectFromToken(token);
-                            // Puedes establecer un usuario autenticado en el contexto del WebSocket
-                            accessor.setUser(new StompPrincipal(email));
-                        } else {
-                            // Si el token es inválido, rechaza el mensaje de conexión
-                            return null;
-                        }
-                    } else {
-                        // Si no se envía token, también puedes decidir rechazar la conexión o permitirla de forma anónima
-                        return null;
-                    }
+                    // Temporalmente permitir la conexión sin token (para depuración)
+                    // if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                    //     String token = authHeader.substring(7);
+                    //     if (jwtUtils.validateToken(token)){
+                    //         String email = jwtUtils.getSubjectFromToken(token);
+                    //         accessor.setUser(new StompPrincipal(email));
+                    //     } else {
+                    //         return null;
+                    //     }
+                    // } else {
+                    //     return null;
+                    // }
+                    accessor.setUser(new StompPrincipal("prueba@example.com"));
                 }
+
                 return message;
             }
         });
+
     }
+
 }

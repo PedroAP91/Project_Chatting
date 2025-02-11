@@ -1,0 +1,30 @@
+{
+  "name": "my-chat-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@mdi/font": "^7.4.47",
+    "@stomp/stompjs": "^7.0.0",
+    "axios": "^1.7.9",
+    "sockjs-client": "^1.6.1",
+    "vite-plugin-vuetify": "^2.1.0",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0",
+    "vuetify": "^3.7.11"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.1",
+    "@types/sockjs-client": "^1.5.4",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/tsconfig": "^0.7.0",
+    "typescript": "~5.7.2",
+    "vite": "^6.1.0",
+    "vue-tsc": "^2.2.0"
+  }
+}

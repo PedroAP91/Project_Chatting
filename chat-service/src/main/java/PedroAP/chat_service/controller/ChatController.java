@@ -2,7 +2,8 @@ package PedroAP.chat_service.controller;
 
 import PedroAP.chat_service.model.ChatMessage;
 import com.proyect.chatting.security.JwtUtils;
-
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -14,14 +15,12 @@ public class ChatController {
         this.jwtUtils = jwtUtils;
     }
 
+    @MessageMapping("/sendMessage")
+    @SendTo("/topic/messages")
     public ChatMessage sendMessage(ChatMessage message) {
-        // Aquí se invoca el método validateToken de JwtUtils
-        String token = "someToken"; // En un escenario real, extraerías el token de los headers de la solicitud
-        if (jwtUtils.validateToken(token)) {
-            // Si el token es válido, procesamos el mensaje
-            return message;
-        } else {
-            throw new IllegalArgumentException("Token inválido");
-        }
+        // Agrega un log para confirmar que se recibe el mensaje
+        System.out.println("Mensaje recibido en STOMP: " + message.getText());
+        // Puedes agregar lógica adicional (por ejemplo, persistencia o timestamp) aquí
+        return message;
     }
 }

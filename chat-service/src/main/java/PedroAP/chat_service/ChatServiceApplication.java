@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = "com.proyect.chatting")
+@ComponentScan(basePackages = {"PedroAP.chat_service", "com.proyect.chatting"})
 public class ChatServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(ChatServiceApplication.class, args);

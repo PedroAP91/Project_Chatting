@@ -2,11 +2,9 @@ package PedroAP.chat_service.controller;
 
 import PedroAP.chat_service.model.ChatMessage;
 import com.proyect.chatting.security.JwtUtils;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,9 +35,7 @@ public class ChatControllerTest {
         assertEquals("user", result.getFrom());
         assertEquals("Hello, world!", result.getText());
 
-        // Verificar interacciones con el mock
+        // Verificar que se llamó a validateToken exactamente una vez
         Mockito.verify(jwtUtils, times(1)).validateToken(Mockito.anyString());
     }
-
-
 }
