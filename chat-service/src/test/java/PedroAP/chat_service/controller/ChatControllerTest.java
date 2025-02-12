@@ -1,41 +1,37 @@
 package PedroAP.chat_service.controller;
 
+import PedroAP.chat_service.controller.ChatController;
 import PedroAP.chat_service.model.ChatMessage;
 import com.proyect.chatting.security.JwtUtils;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
 
-public class ChatControllerTest {
+@ExtendWith(MockitoExtension.class)
+class ChatControllerTest {
 
-    private ChatController chatController;
+    @Mock
     private JwtUtils jwtUtils;
 
-    @BeforeEach
-    void setUp() {
-        jwtUtils = mock(JwtUtils.class);
-        chatController = new ChatController(jwtUtils);
-    }
+    @InjectMocks
+    private ChatController chatController;
 
     @Test
     void testSendMessage() {
-        // Configurar el mock para que devuelva resultados específicos
-        Mockito.when(jwtUtils.validateToken(Mockito.anyString())).thenReturn(true);
+        // Simula que el token es válido
+        when(jwtUtils.validateToken("mock-token")).thenReturn(true);
 
-        // Preparar el mensaje de prueba
-        ChatMessage inputMessage = new ChatMessage("user", "Hello, world!");
+        // Crea un mensaje simulado
+        ChatMessage message = new ChatMessage();
+        message.setText("Hola Mundo!");
 
-        // Ejecutar el método
-        ChatMessage result = chatController.sendMessage(inputMessage);
+        // Llama al método con el token de prueba
+        chatController.sendMessage("mock-token", message);
 
-        // Verificar el resultado
-        assertNotNull(result);
-        assertEquals("user", result.getFrom());
-        assertEquals("Hello, world!", result.getText());
-
-        // Verificar que se llamó a validateToken exactamente una vez
-        Mockito.verify(jwtUtils, times(1)).validateToken(Mockito.anyString());
+        // Verifica que se llamó a la validación del token
+        verify(jwtUtils).validateToken("mock-token");
     }
 }

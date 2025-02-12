@@ -41,30 +41,37 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registration.interceptors(new ChannelInterceptor() {
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
-                // Extraemos el header del mensaje
                 StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-                // Si es un mensaje de conexión, validamos el token
+
                 if (StompCommand.CONNECT.equals(accessor.getCommand())) {
                     String authHeader = accessor.getFirstNativeHeader("Authorization");
-                    // Temporalmente permitir la conexión sin token (para depuración)
-                    // if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                    //     String token = authHeader.substring(7);
-                    //     if (jwtUtils.validateToken(token)){
-                    //         String email = jwtUtils.getSubjectFromToken(token);
-                    //         accessor.setUser(new StompPrincipal(email));
-                    //     } else {
-                    //         return null;
-                    //     }
-                    // } else {
-                    //     return null;
-                    // }
-                    accessor.setUser(new StompPrincipal("prueba@example.com"));
+                    System.out.println("Token recibido en WebSocket: " + authHeader);
+
+                    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                        System.err.println("Error: Header de autorización faltante o incorrecto.");
+                        return null;
+                    }
+
+                    String token = authHeader.substring(7);
+                    System.out.println("Token extraído: " + token);
+
+                    if (!jwtUtils.validateToken(token)) {
+                        System.err.println("Error: Token inválido.");
+                        return null;
+                    }
+
+                    String usuario = jwtUtils.getSubjectFromToken(token);
+                    System.out.println("Usuario autenticado: " + usuario);
+                    accessor.setUser(new StompPrincipal(usuario));
                 }
 
                 return message;
             }
-        });
 
+        });
     }
 
+
 }
+
+

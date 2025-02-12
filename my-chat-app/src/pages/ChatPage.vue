@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Client, type Message } from '@stomp/stompjs'
 import SockJS from 'sockjs-client'
 
@@ -46,34 +46,36 @@ export default {
     const client = ref<Client | null>(null)
 
     onMounted(() => {
-      client.value = new Client({
-        webSocketFactory: () => new SockJS('http://localhost:8081/chat'),
-        reconnectDelay: 5000,
-        debug: (msg) => console.log('STOMP debug:', msg),
-        connectHeaders: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        },
-        onConnect: (frame) => {
-          console.log('Conectado con STOMP:', frame)
-          isConnected.value = true
-        },
-        onStompError: (frame) => {
-          console.error('Error STOMP:', frame)
-        },
-      })
-      client.value.activate()
-    })
+  const token = localStorage.getItem('token');
+  console.log('Token almacenado en localStorage:', token);
 
-    // Suscribirse al tópico cuando se establezca la conexión
-    watch(isConnected, (newVal) => {
-      if (newVal && client.value) {
-        client.value.subscribe('/topic/messages', (messageFrame: Message) => {
-          console.log('Mensaje recibido:', messageFrame.body)
-          const body: ChatMessage = JSON.parse(messageFrame.body)
-          messages.value.push(body)
-        })
-      }
-    })
+  client.value = new Client({
+    webSocketFactory: () => new SockJS('http://localhost:8081/chat'),
+    reconnectDelay: 5000,
+    debug: (msg) => console.log('STOMP debug:', msg),
+    connectHeaders: {
+      Authorization: `Bearer ${token}`
+    },
+    onConnect: (frame) => {
+      console.log('Conectado con STOMP:', frame);
+      isConnected.value = true;
+
+      // 🔴 Asegúrate de suscribirte al topic correcto
+      client.value!.subscribe('/topic/messages', (message: Message) => {
+  console.log('Mensaje recibido en STOMP:', message.body);
+  const receivedMessage: ChatMessage = JSON.parse(message.body);
+  messages.value.push(receivedMessage);
+});
+
+    },
+    onStompError: (frame) => {
+      console.error('Error STOMP:', frame);
+    },
+  });
+
+  client.value.activate();
+});
+
 
     const sendMessage = () => {
   if (message.value.trim() === '') return;
@@ -81,14 +83,22 @@ export default {
     console.error("No underlying STOMP connection, please wait.");
     return;
   }
+  
   const msg: ChatMessage = { from: 'UsuarioX', text: message.value };
+
+  // Publicar mensaje con un header personalizado
   client.value.publish({
     destination: '/app/sendMessage',
-    body: JSON.stringify(msg)
+    body: JSON.stringify(msg),
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`
+    }
   });
+
   console.log('Mensaje enviado:', msg);
   message.value = '';
-}
+};
+
 
     return { messages, message, sendMessage, isConnected }
   },
