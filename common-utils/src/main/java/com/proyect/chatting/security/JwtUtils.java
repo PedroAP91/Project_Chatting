@@ -14,65 +14,65 @@ import java.util.Date;
 public class JwtUtils {
 
     private final SecretKey key;
+    private final SecretKey refreshKey;
     private final String secret;
+    private final String refreshSecret;
 
-    public JwtUtils(@Value("${jwt.secret}") String secret) {
+    public JwtUtils(
+            @Value("${jwt.secret}") String secret,
+            @Value("${jwt.refresh-secret}") String refreshSecret) {
         this.secret = secret;
-        try {
-            byte[] decodedKey = Base64.getDecoder().decode(secret);
-            this.key = Keys.hmacShaKeyFor(decodedKey);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("❌ Error al decodificar jwt.secret, revisa que sea una clave Base64 válida.", e);
-        }
+        this.refreshSecret = refreshSecret;
+        this.key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret));
+        this.refreshKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(refreshSecret));
     }
-
 
     @PostConstruct
     public void init() {
         System.out.println("🔑 Clave secreta JWT cargada correctamente: " + (secret != null ? "OK" : "NO CARGADA"));
     }
 
-    public String generateToken(String email) {
+    // Generar Token de Acceso (válido por 1 hora)
+    public String generateAccessToken(String email) {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 hora
-                .signWith(key, SignatureAlgorithm.HS256) // Explicitamos el algoritmo
+                .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public boolean validateToken(String token) {
+    // Generar Refresh Token (válido por 7 días)
+    public String generateRefreshToken(String email) {
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 604800000)) // 7 días
+                .signWith(refreshKey, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    // Validar Token
+    public boolean validateToken(String token, boolean isRefresh) {
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token);
+            SecretKey secretKey = isRefresh ? refreshKey : key;
+            Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
             return true;
         } catch (ExpiredJwtException e) {
             System.err.println("⚠ Token expirado: " + e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            System.err.println("⚠ Token no soportado: " + e.getMessage());
-        } catch (MalformedJwtException e) {
-            System.err.println("⚠ Token mal formado: " + e.getMessage());
-        } catch (SignatureException e) {
-            System.err.println("⚠ Firma inválida: " + e.getMessage());
-        } catch (IllegalArgumentException e) {
-            System.err.println("⚠ Argumento inválido: " + e.getMessage());
+        } catch (JwtException e) {
+            System.err.println("⚠ Token inválido: " + e.getMessage());
         }
         return false;
     }
 
-    public String getSubjectFromToken(String token) {
-        try {
-            return Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody()
-                    .getSubject();
-        } catch (Exception e) {
-            System.err.println("⚠ Error obteniendo subject del token: " + e.getMessage());
-            return null;
-        }
+    public String getSubjectFromToken(String token, boolean isRefresh) {
+        SecretKey secretKey = isRefresh ? refreshKey : key;
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 }

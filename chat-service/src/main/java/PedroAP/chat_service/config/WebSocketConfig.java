@@ -13,28 +13,27 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import com.proyect.chatting.security.JwtUtils;
+import java.security.Principal;
 
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Autowired
-    private JwtUtils jwtUtils; // Asegúrate de que esta clase esté correctamente implementada
+    private JwtUtils jwtUtils;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        // Configura el broker simple para los tópicos
         registry.enableSimpleBroker("/topic");
-        // Prefijo para mensajes dirigidos a métodos en los controladores
         registry.setApplicationDestinationPrefixes("/app");
     }
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/chat")
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
-
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
@@ -55,23 +54,32 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                     String token = authHeader.substring(7);
                     System.out.println("Token extraído: " + token);
 
-                    if (!jwtUtils.validateToken(token)) {
+                    if (!jwtUtils.validateToken(token, false)) {
                         System.err.println("Error: Token inválido.");
                         return null;
                     }
 
-                    String usuario = jwtUtils.getSubjectFromToken(token);
+                    String usuario = jwtUtils.getSubjectFromToken(token, false);
                     System.out.println("Usuario autenticado: " + usuario);
                     accessor.setUser(new StompPrincipal(usuario));
                 }
 
                 return message;
             }
-
         });
     }
 
+    // Clase interna para representar un usuario autenticado en STOMP
+    public static class StompPrincipal implements Principal {
+        private final String name;
 
+        public StompPrincipal(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+    }
 }
-
-

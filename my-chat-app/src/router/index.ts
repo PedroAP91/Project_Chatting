@@ -1,11 +1,12 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import LoginPage from "../pages/LoginPage.vue";
 import ChatPage from "../pages/ChatPage.vue";
 
-const routes = [
+const routes: Array<RouteRecordRaw> = [
   { path: "/", redirect: "/login" },
-  { path: "/login", component: LoginPage },
-  { path: "/chat", component: ChatPage, meta: { requiresAuth: true } },
+  { path: "/login", name: "Login", component: LoginPage },
+  { path: "/chat", name: "Chat", component: ChatPage, meta: { requiresAuth: true } },
+  // En el futuro, podrías agregar rutas para registro, salas privadas, etc.
 ];
 
 const router = createRouter({
@@ -13,10 +14,13 @@ const router = createRouter({
   routes,
 });
 
+// Guard global que verifica la presencia del token en localStorage
 router.beforeEach((to, _from, next) => {
-  const token = localStorage.getItem("token");
+  // Nota: ahora usamos "accessToken", ya que el login lo almacena con esa clave
+  const token = localStorage.getItem("accessToken");
   if (to.meta.requiresAuth && !token) {
-    next("/login");
+    console.warn("Ruta protegida: no se encontró accessToken. Redirigiendo a login.");
+    next({ name: "Login" });
   } else {
     next();
   }

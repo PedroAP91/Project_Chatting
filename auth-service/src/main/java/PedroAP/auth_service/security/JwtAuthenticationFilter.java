@@ -36,9 +36,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = authHeader.substring(7);
 
             // Valida el token
-            if (jwtUtils.validateToken(token)) {
+            if (jwtUtils.validateToken(token, false)) {
                 // Si es válido, obtenemos el email del token
-                String email = jwtUtils.getSubjectFromToken(token);
+                String email = jwtUtils.getSubjectFromToken(token, false);
 
                 if (email != null) {
                     SecurityContextHolder.getContext().setAuthentication(

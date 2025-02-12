@@ -58,27 +58,23 @@ export default {
           email: email.value,
           password: password.value,
         });
-        const { token } = response.data;
-        localStorage.setItem('token', token);
+        // Extraer y almacenar los tokens con las claves correctas
+        const { accessToken, refreshToken } = response.data;
+        console.log("Token recibido:", accessToken); // Debug: verifica la respuesta
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('refreshToken', refreshToken);
+        // Verifica en la consola o en las DevTools que los tokens se hayan guardado
+        console.log("LocalStorage después del login:", {
+          accessToken: localStorage.getItem('accessToken'),
+          refreshToken: localStorage.getItem('refreshToken')
+        });
         router.push('/chat');
       } catch (err) {
         error.value = 'Credenciales inválidas';
+        console.error("Error en login:", err);
       }
     };
-
     return { email, password, error, login, loginForm };
   },
 };
 </script>
-
-<style scoped>
-h1 {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 16px;
-}
-
-.v-main {
-  background-color: #f5f5f5;
-}
-</style>

@@ -43,7 +43,7 @@ public class UserService {
         // Comparar contraseña usando BCrypt
         if (passwordEncoder.matches(password, user.getPassword())) {
             // Generar el token con jwtUtils
-            String token = jwtUtils.generateToken(email);
+            String token = jwtUtils.generateAccessToken(email);
             // Puedes agregar un log para confirmar
             System.out.println("Token generado: " + token);
             return token;

@@ -1,6 +1,7 @@
 PedroAP\chat_service\config\WebSocketConfig.class
 PedroAP\chat_service\model\ChatMessage.class
 PedroAP\chat_service\config\WebSocketConfig$1.class
+PedroAP\chat_service\config\WebSocketConfig$StompPrincipal.class
 PedroAP\chat_service\config\JwtHandshakeInterceptor.class
 PedroAP\chat_service\config\SecurityConfig.class
 PedroAP\chat_service\config\StompPrincipal.class
