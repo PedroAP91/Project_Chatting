@@ -1,13 +1,14 @@
 // src/main.ts
-import { createApp } from 'vue'
-import App from './App.vue'
-import router from './router'
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from './router';
 import vuetify from './plugins/vuetify';
+import { createPinia } from 'pinia';
 
-import '@mdi/font/css/materialdesignicons.css';  // Importar iconos Material Design
+const app = createApp(App);
+const pinia = createPinia();
 
-
-createApp(App)
-  .use(router)
-  .use(vuetify)  // Aquí lo aplicamos
-  .mount('#app')
+app.use(pinia);    // Aquí se integra Pinia
+app.use(router);
+app.use(vuetify);
+app.mount('#app');

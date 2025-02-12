@@ -34,7 +34,7 @@ import { ref, onMounted, watch } from 'vue';
 import { Client, type IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { useRouter } from 'vue-router';
-import { refreshToken } from '../utils/auth'; // Asegúrate de que esta función esté bien implementada
+import refreshToken from '../services/authService';
 
 // Definición de la interfaz para los mensajes del chat
 interface ChatMessage {
@@ -111,7 +111,7 @@ export default {
       }
 
       // Se verifica (y refresca) el token antes de enviar el mensaje
-      const isTokenValid = await refreshToken();
+      const isTokenValid = await refreshToken.refreshToken();
       if (!isTokenValid) {
         console.warn("⚠ El token es inválido. Redirigiendo a login.");
         alert("Sesión expirada. Por favor, inicia sesión nuevamente.");
