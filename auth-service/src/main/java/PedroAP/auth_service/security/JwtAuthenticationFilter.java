@@ -38,11 +38,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Valida el token
             if (jwtUtils.validateToken(token, false)) {
                 // Si es válido, obtenemos el email del token
-                String email = jwtUtils.getSubjectFromToken(token, false);
+                String nick = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-                if (email != null) {
+
+                if (nick != null) {
                     SecurityContextHolder.getContext().setAuthentication(
-                            new UsernamePasswordAuthenticationToken(email, null, null)
+                            new UsernamePasswordAuthenticationToken(nick, null, null)
                     );
                 }
             } else {

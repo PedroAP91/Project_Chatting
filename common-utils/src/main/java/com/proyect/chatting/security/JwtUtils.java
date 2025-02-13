@@ -37,17 +37,29 @@ public class JwtUtils {
         return Jwts.builder()
                 .setSubject(email)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // 1 hora
+                .setExpiration(new Date(System.currentTimeMillis() + 3600000))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // Generar Refresh Token (válido por 7 días)
+    // Generar Access Token con nick (si lo necesitas)
+    public String generateAccessToken(String email, String nick) {
+        return Jwts.builder()
+                .setSubject(email)
+                .claim("nick", nick)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 3600000))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    // Generar Refresh Token (válido por 7 días) con claim "type": "refresh"
     public String generateRefreshToken(String email) {
         return Jwts.builder()
                 .setSubject(email)
+                .claim("type", "refresh")
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 604800000)) // 7 días
+                .setExpiration(new Date(System.currentTimeMillis() + 604800000))
                 .signWith(refreshKey, SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -56,7 +68,19 @@ public class JwtUtils {
     public boolean validateToken(String token, boolean isRefresh) {
         try {
             SecretKey secretKey = isRefresh ? refreshKey : key;
-            Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token);
+            Jws<Claims> jwsClaims = Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token);
+
+            if (isRefresh) {
+                Object type = jwsClaims.getBody().get("type");
+                System.out.println("Refresh token type: " + type);
+                if (type == null || !type.equals("refresh")) {
+                    System.err.println("⚠ Refresh token inválido: falta o es incorrecto el claim 'type'");
+                    return false;
+                }
+            }
             return true;
         } catch (ExpiredJwtException e) {
             System.err.println("⚠ Token expirado: " + e.getMessage());
@@ -75,4 +99,20 @@ public class JwtUtils {
                 .getBody()
                 .getSubject();
     }
+    public Object getClaimFromToken(String token, String claimName, boolean isRefresh) {
+        SecretKey secretKey = isRefresh ? refreshKey : key;
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.get(claimName);
+    }
+
+    // Sobrecarga para llamadas sin el parámetro booleano (asume false)
+    public String getSubjectFromToken(String token) {
+        return getSubjectFromToken(token, false);
+    }
 }
+
+

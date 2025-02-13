@@ -4,14 +4,14 @@ import java.security.Principal;
 
 public class StompPrincipal implements Principal {
 
-    private String name;
+    private String nick;
 
-    public StompPrincipal(String name) {
-        this.name = name;
+    public StompPrincipal(String nick) {
+        this.nick = nick;
     }
 
     @Override
     public String getName() {
-        return name;
+        return nick;
     }
 }

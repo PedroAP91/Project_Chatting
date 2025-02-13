@@ -26,12 +26,22 @@
               class="mb-4"
             ></v-text-field>
 
-            <v-btn color="primary" block type="submit" class="mb-4">Entrar</v-btn>
+            <v-btn color="primary" block type="submit" class="mb-4">
+              Entrar
+            </v-btn>
 
             <v-alert v-if="error" type="error" dense class="mt-2">
               {{ error }}
             </v-alert>
           </v-form>
+
+          <!-- Enlace para ir a la página de registro -->
+          <div class="text-center mt-4">
+            <span>¿No tienes cuenta?</span>
+            <v-btn variant="text" color="secondary" @click="goToRegister">
+              Regístrate aquí
+            </v-btn>
+          </div>
         </v-card>
       </v-container>
     </v-main>
@@ -58,23 +68,28 @@ export default {
           email: email.value,
           password: password.value,
         });
-        // Extraer y almacenar los tokens con las claves correctas
+        // Extraer y almacenar los tokens correctamente
         const { accessToken, refreshToken } = response.data;
-        console.log("Token recibido:", accessToken); // Debug: verifica la respuesta
+        console.log("Token recibido:", accessToken);
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('refreshToken', refreshToken);
-        // Verifica en la consola o en las DevTools que los tokens se hayan guardado
+        localStorage.removeItem('messages');
         console.log("LocalStorage después del login:", {
           accessToken: localStorage.getItem('accessToken'),
           refreshToken: localStorage.getItem('refreshToken')
         });
-        router.push('/chat');
+        router.push({ name: 'RoomSelection' });
       } catch (err) {
         error.value = 'Credenciales inválidas';
         console.error("Error en login:", err);
       }
     };
-    return { email, password, error, login, loginForm };
+
+    const goToRegister = () => {
+      router.push('/register');
+    };
+
+    return { email, password, error, login, loginForm, goToRegister };
   },
 };
 </script>

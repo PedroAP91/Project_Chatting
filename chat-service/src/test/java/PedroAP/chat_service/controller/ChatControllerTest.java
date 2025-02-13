@@ -1,6 +1,5 @@
 package PedroAP.chat_service.controller;
 
-import PedroAP.chat_service.controller.ChatController;
 import PedroAP.chat_service.model.ChatMessage;
 import com.proyect.chatting.security.JwtUtils;
 import org.junit.jupiter.api.Test;
@@ -9,10 +8,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ChatControllerTest {
@@ -23,21 +22,22 @@ class ChatControllerTest {
     @InjectMocks
     private ChatController chatController;
 
-
     @Test
     public void testSendMessage() {
         String token = "mock-token";
+        String roomCode = "12345";
 
-        // Usa lenient() para evitar el error
-        lenient().when(jwtUtils.validateToken(anyString(), eq(false))).thenReturn(true);
-        lenient().when(jwtUtils.getSubjectFromToken(anyString(), eq(false))).thenReturn("testUser");
+        // Configuramos el mock para que el token sea válido
+        when(jwtUtils.validateToken(anyString(), eq(false))).thenReturn(true);
 
+        // Creamos un mensaje de prueba
         ChatMessage message = new ChatMessage("testUser", "Hola mundo");
 
-        ChatMessage response = chatController.sendMessage("Bearer " + token, message);
+        // Llamamos al método sendMessage con roomCode, token y el mensaje
+        ChatMessage response = chatController.sendMessage(roomCode, "Bearer " + token, message);
 
+        // Verificamos que la respuesta no sea nula y tenga el texto esperado
         assertNotNull(response);
         assertEquals("Hola mundo", response.getText());
     }
-
 }

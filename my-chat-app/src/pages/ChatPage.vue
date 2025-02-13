@@ -34,9 +34,9 @@ import { ref, onMounted, watch } from 'vue';
 import { Client, type IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { useRouter } from 'vue-router';
-import refreshToken from '../services/authService';
+import refreshToken from '../services/authService'; // Asegúrate de que refreshToken.refreshToken() esté definido
 
-// Definición de la interfaz para los mensajes del chat
+// Interfaz para los mensajes del chat
 interface ChatMessage {
   from: string;
   text: string;
@@ -46,14 +46,12 @@ export default {
   name: 'ChatPage',
   setup() {
     const router = useRouter();
-    // Se carga el historial de mensajes del localStorage para persistencia
     const messages = ref<ChatMessage[]>(JSON.parse(localStorage.getItem('messages') || '[]'));
     const message = ref('');
     const isConnected = ref(false);
     const client = ref<Client | null>(null);
 
     const connectToWebSocket = () => {
-      // Obtenemos el token usando la clave "accessToken"
       const token = localStorage.getItem("accessToken");
       console.log("Token en ChatPage:", token);
       if (!token) {
@@ -62,7 +60,6 @@ export default {
         return;
       }
 
-      // Configuración del cliente STOMP usando SockJS
       client.value = new Client({
         webSocketFactory: () => new SockJS("http://localhost:8081/chat"),
         reconnectDelay: 5000,
@@ -104,36 +101,41 @@ export default {
     };
 
     const sendMessage = async () => {
-      if (message.value.trim() === '') return;
-      if (!client.value || !isConnected.value) {
-        console.error("⚠ No hay conexión WebSocket.");
-        return;
+  if (message.value.trim() === '') return;
+  if (!client.value || !isConnected.value) {
+    console.error("⚠ No hay conexión WebSocket.");
+    return;
+  }
+
+  try {
+    // Intenta refrescar el token antes de enviar el mensaje
+    const isTokenValid = await refreshToken.refreshToken(localStorage.getItem('refreshToken'));
+    if (!isTokenValid) {
+      console.warn("⚠ El token es inválido o ha expirado. Redirigiendo a login.");
+      alert("Sesión expirada. Por favor, inicia sesión nuevamente.");
+      router.push('/login');
+      return;
+    }
+
+    // Si el token se refrescó correctamente, envía el mensaje
+    const msg: ChatMessage = { from: 'UsuarioX', text: message.value };
+    client.value.publish({
+      destination: '/app/sendMessage',
+      body: JSON.stringify(msg),
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
       }
+    });
+    console.log("📤 Mensaje enviado:", msg);
+    message.value = '';
+  } catch (error) {
+    console.error("Error al enviar el mensaje:", error);
+    router.push('/login');
+  }
+};
 
-      // Se verifica (y refresca) el token antes de enviar el mensaje
-      const isTokenValid = await refreshToken.refreshToken();
-      if (!isTokenValid) {
-        console.warn("⚠ El token es inválido. Redirigiendo a login.");
-        alert("Sesión expirada. Por favor, inicia sesión nuevamente.");
-        router.push('/login');
-        return;
-      }
 
-      const msg: ChatMessage = { from: 'UsuarioX', text: message.value };
-
-      client.value.publish({
-        destination: '/app/sendMessage',
-        body: JSON.stringify(msg),
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`
-        }
-      });
-
-      console.log("📤 Mensaje enviado:", msg);
-      message.value = '';
-    };
-
-    // Sincroniza el historial de mensajes en el localStorage para persistencia
+    // Sincroniza el historial de mensajes en localStorage
     watch(messages, (newMessages) => {
       localStorage.setItem('messages', JSON.stringify(newMessages));
     }, { deep: true });

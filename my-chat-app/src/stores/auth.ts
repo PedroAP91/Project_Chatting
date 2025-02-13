@@ -17,7 +17,7 @@ export const useAuthStore = defineStore('auth', {
         const response = await authService.login(credentials);
         const { accessToken, refreshToken } = response.data;
         this.setTokens(accessToken, refreshToken);
-        // Aquí puedes llamar a otro endpoint para obtener información del usuario si es necesario
+        // Opcional: obtener datos adicionales del usuario
       } catch (error) {
         console.error('Error en login:', error);
         throw error;
@@ -26,7 +26,7 @@ export const useAuthStore = defineStore('auth', {
     async register(user: { email: string; password: string }) {
       try {
         await authService.register(user);
-        // Opcional: después de registrar, podrías redirigir al login o hacer login automático.
+        // Opcional: redirigir o iniciar sesión automáticamente tras el registro
       } catch (error) {
         console.error('Error en registro:', error);
         throw error;

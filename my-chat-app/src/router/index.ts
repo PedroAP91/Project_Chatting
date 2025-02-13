@@ -1,12 +1,16 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import LoginPage from "../pages/LoginPage.vue";
 import ChatPage from "../pages/ChatPage.vue";
+import RegisterPage from "../pages/RegisterPage.vue";
+import RoomSelectionPage from "@/pages/RoomSelectionPage.vue";
+import ChatRoom from "@/pages/ChatRoom.vue";
 
 const routes: Array<RouteRecordRaw> = [
-  { path: "/", redirect: "/login" },
-  { path: "/login", name: "Login", component: LoginPage },
-  { path: "/chat", name: "Chat", component: ChatPage, meta: { requiresAuth: true } },
-  // En el futuro, podrías agregar rutas para registro, salas privadas, etc.
+  { path: '/', redirect: '/login' },
+  { path: '/login', name: 'Login', component: LoginPage },
+  { path: '/register', name: 'Register', component: RegisterPage },
+  { path: '/rooms', name: 'RoomSelection', component: RoomSelectionPage },
+  { path: '/chat/:roomCode', name: 'ChatRoom', component: ChatRoom, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({
@@ -14,9 +18,8 @@ const router = createRouter({
   routes,
 });
 
-// Guard global que verifica la presencia del token en localStorage
+// Guard global para rutas protegidas
 router.beforeEach((to, _from, next) => {
-  // Nota: ahora usamos "accessToken", ya que el login lo almacena con esa clave
   const token = localStorage.getItem("accessToken");
   if (to.meta.requiresAuth && !token) {
     console.warn("Ruta protegida: no se encontró accessToken. Redirigiendo a login.");
