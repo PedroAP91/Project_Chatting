@@ -8,7 +8,7 @@
     <!-- Hereda la configuración del POM padre -->
     <parent>
         <groupId>com.proyect.chatting</groupId>
-        <artifactId>Proyect_Chatting</artifactId>
+        <artifactId>Project_Chatting</artifactId>
         <version>1.0.0</version>
     </parent>
 
