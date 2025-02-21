@@ -1,5 +1,5 @@
 
-# 💬 Proyect Chatting - Chat en Tiempo Real con Java + Vue.js  
+# 💬 Project Chatting - Chat en Tiempo Real con Java + Vue.js  
 🚀 **Aplicación de chat en tiempo real completamente funcional** con **Java (Spring Boot) en el backend y Vue.js en el frontend**. Permite la comunicación instantánea entre usuarios utilizando **WebSockets**.
 
 ## 🔹 Características:
