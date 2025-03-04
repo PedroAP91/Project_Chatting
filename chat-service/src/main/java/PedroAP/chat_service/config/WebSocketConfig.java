@@ -12,7 +12,7 @@ import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-import com.proyect.chatting.security.JwtUtils;
+import com.project.chatting.security.JwtUtils;
 import java.security.Principal;
 
 @Configuration

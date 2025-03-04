@@ -1,4 +1,4 @@
-package com.proyect.chatting.security;
+package com.project.chatting.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

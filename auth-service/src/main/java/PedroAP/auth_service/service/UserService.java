@@ -3,7 +3,7 @@ package PedroAP.auth_service.service;
 import PedroAP.auth_service.dto.UserDTO;
 import PedroAP.auth_service.model.User;
 import PedroAP.auth_service.repository.UserRepository;
-import com.proyect.chatting.security.JwtUtils;
+import com.project.chatting.security.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

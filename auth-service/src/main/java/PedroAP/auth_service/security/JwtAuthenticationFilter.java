@@ -8,7 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.filter.OncePerRequestFilter;
-import com.proyect.chatting.security.JwtUtils;
+import com.project.chatting.security.JwtUtils;
 
 import java.io.IOException;
 

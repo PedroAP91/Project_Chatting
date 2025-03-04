@@ -1,7 +1,7 @@
 package PedroAP.chat_service.controller;
 
 import PedroAP.chat_service.model.ChatMessage;
-import com.proyect.chatting.security.JwtUtils;
+import com.project.chatting.security.JwtUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

@@ -1,4 +1,4 @@
-Proyect_Chatting
+Project_Chatting
 Proyecto basado en microservicios para autenticación y chat en tiempo real, desarrollado con Spring Boot, WebSockets y JWT.
 
 Tabla de Contenidos
